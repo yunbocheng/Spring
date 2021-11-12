@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+    <!--声明student对象
+        注入：就是赋值的意思，给实体类中的属性赋值
+        spring中的简单类型：spring中规定Java的基本数据类型、包装类、String都是简单数据类型。
+        di() : 给属性赋值
+        1. set注入(设值注入) ： spring调用类的set方法，在set方法中进行赋值。
+    -->
+    <bean id="student" class="com.yunbocheng.di01.Student">
+        <!--
+            注意：这里的20是int类型，但是这里仍要使用双引号括起来，这是因为此时的属性值在xml文件中，
+                 xml文件中的属性值都必须使用双引号括起来，这是xml规定的。
+
+                 一个属性对应一个property
+
+                 这种方式赋值调用的是实体类中的set方法赋值。
+
+                 这种方式只是调用了set方法，至于set方法后的代码是什么，我们可以自己规定。
+        -->
+        <property name="age" value="20"/><!--setAge(20)-->
+        <property name="name" value="程云博"/><!--setName("程云博")-->
+    </bean>
+
+    <!--
+         set注入的根本要求是在于：实体类中有没有set的方法，只要存在set方法，就可以通过set注入来进行赋值。
+    -->
+    <bean id="date" class="java.util.Date">
+        <!--使用set注入的方式重新进行时间的赋值-->
+        <property name="time" value="23213213"/>
+    </bean>
+</beans>

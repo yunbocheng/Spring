@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+    <!--
+
+        引用类型的自动注入： spring框架根据某些规则可以给引用类型自动赋值。
+
+        注意 ：这个只能给引用类型自动赋值，不可以给简单数据类型(基本数据类型、包装类、String)进行赋值。
+
+        spring中使用自动注入规则有两个：byName、byType
+
+        1.byName(按名字注入) ：Java类中引用类型的属性值和spring容器中(配置文件)<bean>的id名称一样。
+                             且数据类型一致的，这样容器中的这个bean，spring能够自动赋值给引用类型。
+
+    -->
+    <!--
+        2.byType : Java类中引用类型的数据类型和spring容器中(配置文件)<bean>的class属性值
+                   是同源关系，这样的bean能够自动赋值给引用类型
+          同源就是一类的意思：
+             1. Java类中引用类型的数据类型和bean的class的值是一样的。
+             2. Java类中引用类型的数据类型和bean的class的值是父子类关系。
+             3. Java类中引用类型的数据类型和bean的class的值是接口实现类关系。
+    -->
+    <bean id="student1" class="com.yunbocheng.di05.Student" autowire="byType" >
+        <property name="name" value="程云博"/>
+        <property name="age" value="20"/>
+    </bean>
+
+    <!--
+
+    -->
+    <bean id="mySchool" class="com.yunbocheng.di05.School">
+        <constructor-arg name="Address" value="河北承德"/>
+        <constructor-arg name="name" value="师范大学"/>
+    </bean>
+
+</beans>

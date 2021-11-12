@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!--引用类型的set注入：spring调用类的set方法
+        <property name="属性名称" ref="bean的id(对象的名称)"/>
+    -->
+    <bean id="student" class="com.yunbocheng.di02.Student">
+        <property name="age" value="20"/>
+        <property name="name" value="程云博"/>
+        <!--引用类型-->
+        <property name="school" ref="school"/>
+    </bean>
+
+    <bean id="school" class="com.yunbocheng.di02.School">
+        <property name="name" value="科技大学"/>
+        <property name="address" value="山西太原"/>
+    </bean>
+</beans>

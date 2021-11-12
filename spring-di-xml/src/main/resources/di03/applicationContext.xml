@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+    <!--
+        构造注入：spring调用类有参构造方法，创建对象的同时，在构造方法中给属性赋值。
+        构造注入使用 <constructor-arg> 标签
+        <constructor-arg> 标签：一个<constructor-arg>表示构造方法的一个参数。
+        <constructor-arg> 标签属性：
+            name : 表示构造方法的形参名
+            index : 表示有参构造方法中形参的位置，行参从左往右位置是0,1,2顺序。
+            value : 构造方法中的形参类型是简单类型，使用value
+            ref : 构造方法的形参类型是引用类型，使用ref
+
+        注意 ：使用index的时候，一定要注意有参构造方法与传递参数的顺序，一定要匹配对。
+    -->
+    <bean id="student" class="com.yunbocheng.di03.Student">
+        <constructor-arg name="MyName" value="程云博"/>
+        <constructor-arg name="MyAge" value="20"/>
+        <constructor-arg name="MySchool" value="school"/>
+    </bean>
+
+    <!--使用index赋值，这种模式可以改变顺序，只要保证该序号的赋值的类型和有参构造中类型匹配即可-->
+    <bean id="student1" class="com.yunbocheng.di03.Student">
+        <constructor-arg index="1" value="20"/>
+        <constructor-arg index="0" value="程云博"/>
+        <constructor-arg index="2" value="school"/>
+    </bean>
+
+    <!--index方式的省略模式，这种省略的顺序就是0，1，2-->
+    <bean id="student2" class="com.yunbocheng.di03.Student">
+        <constructor-arg index="0" value="程云博"/>
+        <constructor-arg index="1" value="20"/>
+        <constructor-arg index="2" value="school"/>
+    </bean>
+
+    <!--使用实体类对象赋值-->
+    <bean id="school" class="com.yunbocheng.di03.School">
+        <constructor-arg name="Address" value="河北承德"/>
+        <constructor-arg name="name" value="师范大学"/>
+    </bean>
+</beans>

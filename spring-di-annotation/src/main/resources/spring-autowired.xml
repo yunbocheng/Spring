@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       https://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:component-scan base-package="com.yunbocheng.autowired"/>
+
+    <!--
+        如果使用注解+xml配置文件的方式获取对象，
+        那么在bean中就不需要使用byType或者byName进行声明自动注入
+        因为注解默认是使用的 byType自动注入的方式
+    -->
+<!--    <bean id="mySchool" class="com.yunbocheng.autowired.School">
+        <property name="name" value="清华大学"/>
+        <property name="address" value="北京海淀区"/>
+    </bean>-->
+</beans>

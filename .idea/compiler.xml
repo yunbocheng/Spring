@@ -9,12 +9,17 @@
         <outputRelativeToContentRoot value="true" />
         <module name="Hello-Spring" />
         <module name="spring-di-xml" />
+        <module name="spring-aop-aspectJ" />
+        <module name="spring-di-annotation" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="Hello-Spring" target="1.8" />
-      <module name="spring-di-xml" target="1.7" />
+      <module name="spring-aop-aspectJ" target="1.8" />
+      <module name="spring-di-annotation" target="1.8" />
+      <module name="spring-di-xml" target="1.8" />
       <module name="spring-di-xxml" target="1.8" />
+      <module name="spring-di-注解" target="1.7" />
     </bytecodeTargetLevel>
   </component>
 </project>

@@ -7,6 +7,11 @@
   <groupId>com.yunbocheng</groupId>
   <artifactId>Hello-Spring</artifactId>
   <version>1.0-SNAPSHOT</version>
+  <!--
+    这个属性是代表使用Maven声明周期中的打包将这个项目打包成jar包还是war包，默认是jar，
+    可以省略不写，不写就是jar包。
+  -->
+  <packaging>jar</packaging>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

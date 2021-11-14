@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+    <!--
+        这里使用的是spring自动注入方式
+        这个配置文件是学生模块所有bean的说明，这个模块只保留和学生有关的bean
+    -->
+    <bean id="student" class="com.yunbocheng.di06.Student" autowire="byType" >
+        <property name="name" value="程云博"/>
+        <property name="age" value="30"/>
+    </bean>
+
+
+</beans>

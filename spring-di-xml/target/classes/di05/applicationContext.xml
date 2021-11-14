@@ -30,7 +30,9 @@
     </bean>
 
     <!--
-
+       声明school对象，这个通过实体类中引用类型的类型与bean中的class属性值的类型进行匹配
+       如果类型是一样的就可以实现自动注入。
+       这种自动注 入的方式和id属性没有任何的关系，id属性值可以任意给。
     -->
     <bean id="mySchool" class="com.yunbocheng.di05.School">
         <constructor-arg name="Address" value="河北承德"/>

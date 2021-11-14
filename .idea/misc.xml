@@ -5,6 +5,9 @@
       <list>
         <option value="$PROJECT_DIR$/Hello-Spring/pom.xml" />
         <option value="$PROJECT_DIR$/spring-di-xml/pom.xml" />
+        <option value="$PROJECT_DIR$/untitled/spring-di-注解/pom.xml" />
+        <option value="$PROJECT_DIR$/spring-di-annotation/pom.xml" />
+        <option value="$PROJECT_DIR$/spring-aop-aspectJ/pom.xml" />
       </list>
     </option>
   </component>

@@ -17,6 +17,6 @@
 
         aspectj-autoproxy : 会把spring容器中的所有的目标对象，一次性都生成代理对象。
     -->
-
+    <!--声明自动代理生成器，创建代理-->
     <aop:aspectj-autoproxy />
 </beans>

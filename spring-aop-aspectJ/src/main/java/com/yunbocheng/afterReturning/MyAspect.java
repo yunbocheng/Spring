@@ -50,6 +50,11 @@ public class MyAspect {
     public void myAfterReturning(Object res){
         // Object res : 是目标方法执行后的返回值，根据返回值做其他的功能。
         System.out.println("后置通知：在目标方法之后执行的，获取的返回值是：" + res);
+        if (res.equals("李四")){
+            // 此时的业务
+        }else {
+            // 此时的业务
+        }
     }
 
     @Before(value = "execution(* *..SomeServiceImpl.doSome(..))")
@@ -60,4 +65,25 @@ public class MyAspect {
             System.out.println("获取的参数信息：" + arg);
         }
     }
+
+    /*
+    *
+    * 注意：一定要将JoinPoint这个参数方法通知方法参数列表的第一位
+    *
+    * */
+    @AfterReturning(value = "execution(* *..SomeServiceImpl.doOther(..))",returning = "res")
+    public void myAfterReturning1(JoinPoint point,Object res){
+        // Object res : 是目标方法执行后的返回值，根据返回值做其他的功能。
+        System.out.println("后置通知：在目标方法之后执行的，获取的返回值是：" + res);
+        Object[] args = point.getArgs();
+        for (Object arg : args) {
+            System.out.println("参数值：" + arg);
+        }
+        if (res.equals("李四")){
+            // 此时的业务
+        }else {
+            // 此时的业务
+        }
+    }
+
 }

@@ -7,7 +7,7 @@
     <!--声明目标对象-->
     <bean id="someServiceImpl" class="com.yunbocheng.before.SomeServiceImpl"/>
 
-    <!--声明切面类对象-->
+    <!--声明before切面类对象-->
     <bean id="myAspect" class="com.yunbocheng.before.MyAspect"/>
 
     <!--
@@ -17,5 +17,6 @@
 
         aspectj-autoproxy : 会把spring容器中的所有的目标对象，一次性都生成代理对象。
     -->
+
     <aop:aspectj-autoproxy />
 </beans>

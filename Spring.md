@@ -254,10 +254,83 @@ execution(访问权限 方法返回值 包名.类名.方法名称(方法的参�
 - **execution(* com.yunbocheng.service.* .*(..)) :** 指定切入点的位置是service包中的任意类中的任意方法。
 - **execution(* com.yunbocheng.service..* .*(..))：**指定切入点的位置是 service包或者子包中的任意类的任意方法。".."出现在类名中时，后面必须跟"*"，表示包、子包下的所有类。
 - **execution(* *..service. * .*(..))：** 指定切入点的位置是：多级包下的service子包下所有类(接口)中所有方法为切入点。
-
 - **execution(* *.service. * .*(..))：** 指定切入点的位置是：一级包下的service子包下所有类(接口)中所有方法为切入点。
-
 - **execution(* joke(String,*)) ：** 指定所有的包中的 joke() 方法，该方法的第一个参数为String，第二个参数可以是任意类型。如：joke(String s1,String s2) 、joke(String s1,double d)
-
 - **execution(* joke(String,..))：** 所有的 joke()方法，该方法第一个参数为 String，后面可以有任意个参数且 参数类型不限，如 joke(String s1)、joke(String s1,String s2)和 joke(String s1,double d2,String s3) 都是。
+
+### 3.6 AspectJ 基于注解的 AOP 实现(掌握)
+
+![](https://gitee.com/YunboCheng/imageBad/raw/master/image/20211115103431.png)
+
+
+
+- 在 AspectJ 实现 AOP 时，要引入 AOP 的约束。配置文件中使用的 AOP 约束中的标签， 均是 AspectJ 框架使用的，而非 Spring 框架本身在实现 AOP 时使用的。
+- **AspectJ 对于 AOP 的实现有注解和配置文件两种方式，常用是注解方式。**
+
+**第一步：定义业务接口与实现类**
+
+![image-20211115093838676](https://gitee.com/YunboCheng/imageBad/raw/master/image/image-20211115093838676.png)
+
+**第二步：定义切面类**
+
+类中定义了若干普通方法，将作为不同的通知方法，用来增强功能。
+
+![](https://gitee.com/YunboCheng/imageBad/raw/master/image/20211115093933.png)
+
+**第三步：在spring配置文件(applicationContext.xml)中声明目标对象以及切面类对象**
+
+![](https://gitee.com/YunboCheng/imageBad/raw/master/image/20211115094040.png)
+
+**第四步：在spring的配置文件(applicationContext.xml)注册 AspectJ 的自动代理**
+
+- 在定义好切面 Aspect 后，需要通知 Spring 容器，让容器生成“目标类+ 切面”的代理 对象。这个代理是由容器自动生成的。只需要在 Spring 配置文件中注册一个基于 aspectj 的 自动代理生成器，其就会自动扫描到@Aspect 注解，并按通知类型与切入点，将其织入，并 生成代理。
+
+![image-20211115094650017](https://gitee.com/YunboCheng/imageBad/raw/master/image/image-20211115094650017.png)
+
+- 的底层是由 AnnotationAwareAspectJAutoProxyCreator 实现的。 从其类名就可看出，是基于 AspectJ 的注解适配自动代理生成器。
+- **其工作原理是，通过扫描找到@Aspect 定义的切面类，再由切 面类根据切入点找到目标类的目标方法，再由通知类型找到切入的时间点。**
+
+**第五步：测试类中使用目标对象的 id来进行定位**
+
+![image-20211115094838802](https://gitee.com/YunboCheng/imageBad/raw/master/image/image-20211115094838802.png)
+
+### 3.7 几种通知的使用方式
+
+#### 3.7.1 [掌握]@Before 前置通知-方法有 JoinPoint 参数
+
+- 在目标方法执行之前执行。被注解为前置通知的方法，可以包含一个 JoinPoint 类型参 数。该类型的对象本身就是切入点表达式。**通过该参数，可获取切入点表达式、方法签名、 目标对象等。** 
+
+**不光前置通知的方法，可以包含一个 JoinPoint 类型参数，所有的通知方法均可包含该 参数。**
+
+- **前置通知的核心代码，其余代码和以上代码一致。**
+
+![](https://gitee.com/YunboCheng/imageBad/raw/master/image/20211115093415.png)
+
+#### 3.7.2  [掌握]@AfterReturning 后置通知-注解有 returning 属性
+
+- 在目标方法执行之后执行。**由于是目标方法之后执行，所以可以获取到目标方法的返回值。**该注解的 returning 属性就是用于指定接收方法返回值的变量名的。所以，被注解为后置通知的方法，除了可以包含 JoinPoint 参数外，还可以包含用于接收返回值的变量。该变量最好为 Object 类型，因为目标方法的返回值可能是任何类型。
+
+![](https://gitee.com/YunboCheng/imageBad/raw/master/image/20211115095302.png)
+
+
+
+#### 3.7.3 [掌握]@Around 环绕通知-增强方法有 ProceedingJoinPoint 参数
+
+- 在目标方法执行之前之后执行。被注解为环绕增强的方法要有返回值，Object 类型。并 且方法可以包含一个 ProceedingJoinPoint 类型的参数。接口 ProceedingJoinPoint 其有一个 proceed()方法，用于执行目标方法。若目标方法有返回值，则该方法的返回值就是目标方法 的返回值。最后，环绕增强方法将其返回值返回。该增强方法实际是拦截了目标方法的执行。
+
+![](https://gitee.com/YunboCheng/imageBad/raw/master/image/20211115095521.png)
+
+#### 3.7.4 [了解]@AfterThrowing 异常通知-注解中有 throwing 属性
+
+- 在目标方法抛出异常后执行。该注解的 throwing 属性用于指定所发生的异常类对象。 当然，被注解为异常通知的方法可以包含一个参数 Throwable，参数名称为 throwing 指定的 名称，表示发生的异常对象。
+
+![](https://gitee.com/YunboCheng/imageBad/raw/master/image/20211115095821.png)
+
+![](https://gitee.com/YunboCheng/imageBad/raw/master/image/20211115095837.png)
+
+#### 3.7.5  [了解]@After 最终通知
+
+- 无论目标方法是否抛出异常，该增强均会被执行。
+
+![](https://gitee.com/YunboCheng/imageBad/raw/master/image/20211115095923.png)
 

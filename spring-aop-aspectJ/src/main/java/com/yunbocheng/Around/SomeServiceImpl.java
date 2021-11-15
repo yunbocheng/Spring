@@ -1,4 +1,4 @@
-package com.yunbocheng.afterReturning;
+package com.yunbocheng.Around;
 
 
 // 这个类就是目标类，需要增加功能的类
@@ -15,6 +15,19 @@ public class SomeServiceImpl implements SomeService {
     @Override
     public String doOther(String name, Integer age) {
         System.out.println("======目标方法doOther()==========");
-        return "doFirst";
+        return name;
     }
+
+    @Override
+    public String doFirst(String name, Integer age) {
+        System.out.println("======目标方法doFirst()==========");
+        return name;
+    }
+
+    @Override
+    public String doFirst1(String name, Integer age) {
+        System.out.println("======目标方法doFirst1()==========");
+        return name;
+    }
+
 }

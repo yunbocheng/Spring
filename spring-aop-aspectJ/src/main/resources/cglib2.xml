@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!--把对象交给spring容器，由spring容器统一创建，管理对象-->
+    <!--声明目标对象-->
+    <bean id="someServiceImpl" class="com.yunbocheng.cglib2.SomeServiceImpl"/>
+
+    <!--声明afterReturning切面类对象-->
+    <bean id="myAspect" class="com.yunbocheng.cglib2.MyAspect"/>
+
+    <!--
+        声明自动代理生成器，创建代理
+        此时目标类实现了接口，仍想使用 cglib 的大力模式
+        添加属性
+            proxy-target-class="true" : 告诉spring框架，要使用cglib代理模式
+    -->
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
+</beans>

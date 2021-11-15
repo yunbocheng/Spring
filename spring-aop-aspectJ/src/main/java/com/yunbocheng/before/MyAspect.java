@@ -106,9 +106,8 @@ public class MyAspect {
         System.out.println("方法的名称：" + jp.getSignature().getName());
         // 获取目标方法的实参，获取到的是一个目标方法实参的数组，这个数组中的实参值顺序就是方法中参数的顺序
         Object[] args = jp.getArgs();
-        for (Object arg : args) {
-            System.out.println("参数=" + arg);
-        }
+        System.out.println("姓名：" + args[0]);
+        System.out.println("年龄：" + args[1]);
         // 这就是切面所要执行的功能代码
         System.out.println("前置通知：切面功能：在目标方法之前输出执行时间：" + new Date());
     }

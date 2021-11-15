@@ -1,4 +1,4 @@
-package com.yunbocheng.afterReturning;
+package com.yunbocheng.Around;
 
 public interface SomeService {
 
@@ -6,4 +6,7 @@ public interface SomeService {
 
     String doOther(String name,Integer age);
 
+    String doFirst(String name,Integer age);
+
+    String doFirst1(String name,Integer age);
 }

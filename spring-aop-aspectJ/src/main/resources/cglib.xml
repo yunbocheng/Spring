@@ -5,18 +5,11 @@
 
     <!--把对象交给spring容器，由spring容器统一创建，管理对象-->
     <!--声明目标对象-->
-    <bean id="someServiceImpl" class="com.yunbocheng.afterReturning.SomeServiceImpl"/>
+    <bean id="someServiceImpl" class="com.yunbocheng.cglib.SomeServiceImpl"/>
 
     <!--声明afterReturning切面类对象-->
-    <bean id="myAspect" class="com.yunbocheng.afterReturning.MyAspect"/>
+    <bean id="myAspect" class="com.yunbocheng.cglib.MyAspect"/>
 
-    <!--
-        声明自动代理生成器：使用aspectj框架内的功能，创建目标对象的代理对象。
-        创建代理对象是在内存中实现的，修改目标对象的内存中的结构。创建为代理对象。
-        所以目标对象就是被修改后的代理对象。
-
-        aspectj-autoproxy : 会把spring容器中的所有的目标对象，一次性都生成代理对象。
-    -->
     <!--声明自动代理生成器，创建代理-->
     <aop:aspectj-autoproxy />
 </beans>

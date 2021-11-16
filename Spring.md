@@ -146,7 +146,7 @@ AOP（Aspect Orient Programming），面向切面编程。面向切面编程是�
 
 #### 3.3.5 通知（Advice）
 
-- 通知表示切面的执行时间，Advice 也叫增强。上例中的 MyInvocationHandler 就可以理 解为是一种通知。换个角度来说，通知定义了增强代码切入到目标代码的时间点，是目标方 法执行之前执行，还是之后执行等。通知类型不同，切入时间不同。
+- 表示切面的执行时间，Advice 也叫增强。上例中的 MyInvocationHandler 就可以理 解为是一种通知。换个角度来说，通知定义了增强代码切入到目标代码的时间点，是目标方 法执行之前执行，还是之后执行等。通知类型不同，切入时间不同。
 
 **切入点定义切入的位置，通知定义切入的时间。**
 
@@ -333,4 +333,45 @@ execution(访问权限 方法返回值 包名.类名.方法名称(方法的参�
 - 无论目标方法是否抛出异常，该增强均会被执行。
 
 ![](https://gitee.com/YunboCheng/imageBad/raw/master/image/20211115095923.png)
+
+##  第四章 Spring继承MyBatis
+
+- 将 MyBatis 与 Spring 进行整合，主要解决的问题就是将 SqlSessionFactory 对象交由 Spring 来管理。所以，该整合，只需要将 SqlSessionFactory 的对象生成器 SqlSessionFactoryBean 注 册在 Spring 容器中，再将其注入给 Dao 的实现类即可完成整合。
+- **实现 Spring 与 MyBatis 的整合常用的方式：扫描的 Mapper 动态代理**
+- Spring 像插线板一样，mybatis 框架是插头，可以容易的组合到一起。插线板 spring 插 上 mybatis，两个框架就是一个整体。
+
+- 把MyBatis框架和spring集成在一起，向一个框架一样使用。**使用的是 IoC技术**，因为IoC能创建对象。可以把mybatis框架中的对象交给spring统一创建，开发人员从spring中获取对象。开发人员就不用同时面对两个或者多个框架了，就面对一个spring框架就可以了。
+
+**mybatis使用步骤：**
+
+1. 定义dao接口，StudentDao
+
+2. 定义mapper文件 StudentDao.xml
+
+3. 定义mybatis主配置文件 mybatis.xml
+
+4. 创建web的代理对象，StudentDao  dao = sqlSession.getMapper(StudentDao.class);
+
+   List< Student > students =  dao.selcetStudents();
+
+要是用dao对象，需要使用getMapper()方法.
+
+怎么能使用getMapper()方法，需要哪些条件
+
+1. 获取SqlSession对象，需要使用SqlSessionFactory的openSession()方法。
+2. 创建SqlSessionFactory对象。通过读取mybatis的主配置文件，能创建SqlSessionFactory对象。
+
+**通过以上说明：我们需要让spring创建以下对象**
+
+1. 创建独立的连接池类对象，使用阿里的druid连接池。
+2. 创建SqlSessionFactory对象。
+3. 创建出dao对象。
+
+使用xml的bean标签进行创建。
+
+
+
+
+
+
 

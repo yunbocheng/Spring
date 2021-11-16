@@ -7,6 +7,7 @@
       <module fileurl="file://$PROJECT_DIR$/spring-aop-aspectJ/spring-aop-aspectJ.iml" filepath="$PROJECT_DIR$/spring-aop-aspectJ/spring-aop-aspectJ.iml" />
       <module fileurl="file://$PROJECT_DIR$/spring-di-annotation/spring-di-annotation.iml" filepath="$PROJECT_DIR$/spring-di-annotation/spring-di-annotation.iml" />
       <module fileurl="file://$PROJECT_DIR$/spring-di-xml/spring-di-xml.iml" filepath="$PROJECT_DIR$/spring-di-xml/spring-di-xml.iml" />
+      <module fileurl="file://$PROJECT_DIR$/spring-mybatis/spring-mybatis.iml" filepath="$PROJECT_DIR$/spring-mybatis/spring-mybatis.iml" />
     </modules>
   </component>
 </project>

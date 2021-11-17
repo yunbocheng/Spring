@@ -5,6 +5,8 @@
     <file url="file://$PROJECT_DIR$/Hello-Spring/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/spring-affair-aop/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/spring-affair-aop/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/spring-affair-aspectJ/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/spring-affair-aspectJ/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/spring-aop-aspectJ/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/spring-aop-aspectJ/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/spring-di-annotation/src/main/java" charset="UTF-8" />
@@ -13,5 +15,7 @@
     <file url="file://$PROJECT_DIR$/spring-di-xml/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/spring-mybatis/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/spring-mybatis/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/spring-web/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/spring-web/src/main/resources" charset="UTF-8" />
   </component>
 </project>

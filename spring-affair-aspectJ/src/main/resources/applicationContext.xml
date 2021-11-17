@@ -2,7 +2,8 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd">
 
     <!--这个配置文件的内容是固定的，只需要知道需要创建三个对象：数据源、factory、dao-->
     <!--
@@ -108,17 +109,70 @@
         <property name="saleDao" ref="saleDao"/>
     </bean>
 
-    <!--使用spring的aop方式进行事务处理-->
-    <!--1. 声明事务管理器-->
+
+    <!--声明式事务处理：和源代码完全分离-->
+    <!--1. 声明事务管理对象-->
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-        <!--指定连接的数据库，指定上边定义的数据源-->
         <property name="dataSource" ref="myDataSource"/>
     </bean>
 
-    <!--2. 开启事务注解驱动，告诉spring使用注解管理事务，创建代理对象-->
     <!--
-        注意：这里使用的annotation-driven 一定是tx类下的。
-        transaction-manager : 代表事务管理器的id值
+        2. 声明业务方法的事务属性(隔离级别、传播行为、超时时间)
+           注意：这里导入的也是tx这个类中的advice，千万注意
+
+       id：是一个自定义名称，表示<tx:advice>和</tx:advice>之间配置的内容
+       transaction-manager ： 代表的是事务处理器对象的id值
     -->
-    <tx:annotation-driven transaction-manager="transactionManager"/>
+    <tx:advice id="myAdvice" transaction-manager="transactionManager">
+        <!--tx:attributes：是advice的子标签，代表配置这个事务的属性-->
+        <tx:attributes>
+            <!--
+                tx:method：给具体方法配置事务属性，method可以有多个，分别给不同的方法设置事务属性
+                name : 方法名称，1) 完整的方法名称，不带有包和类。就单纯的是方法名称（buy），而不是方法（buy()）
+                               2) 方法可以使用通配符，*表示任意字符
+                               3) 在实际开发中，我们需要添加大量的事务。所以我们使用通配符的方式。
+                propagation : 传播方式，枚举类型
+                isolation : 隔离级别
+                rollback-for : 指定的异常类名，必须是全限定名称。发生异常时一定回滚。
+                               这个的执行原理也是先找我们声明的异常列表，如果有回滚，
+                               如果在异常列表中不存在这个异常，那么spring会判断这个异常
+                               是不是运行时异常，如果是一定发生回滚，如果不是程序正常执行。
+
+               注意：spring寻找name属性的时候。存在一定的顺序。
+                    全名称 > 半名称+通配符 > *
+            -->
+            <tx:method name="buy" propagation="REQUIRED" isolation="DEFAULT"
+                       rollback-for="java.lang.NullPointerException,com.yunbocheng.error.RangeExceeds"/>
+            <!--使用通配符的方式，一次指定很多个以 add开头的方法-->
+            <tx:method name="add*" propagation="REQUIRES_NEW"/>
+            <!--使用通配符指定修改方法-->
+            <tx:method name="modify*" />
+            <!--指定除了上边的所有方法的属性-->
+            <tx:method name="*" read-only="true" propagation="SUPPORTS" />
+        </tx:attributes>
+    </tx:advice>
+
+    <!--3.配置aop-->
+    <aop:config>
+        <!--
+            配置切入点表达式：指定哪些包中类，要使用事务
+            id ：切入点表达式的名称，唯一值。
+            expression : 切入点表达式，指定哪些类要使用事务，aspectJ会创建代理对象。
+
+            com.yunbocheng.service
+            com.crm.service
+            com.service
+
+            execution(* *..service..*.*(..)) : 这个就代表任意包下的service包以及子包中的所有的类中的所有方法
+        -->
+        <aop:pointcut id="servicePt" expression="execution(* *..service..*.*(..))"/>
+
+        <!--
+            配置增强器：关联advice 和 pointcut，也就是指定类中的方法的配置信息
+            advice-ref ：指定类中的方法的配置
+            pointcut-ref ：切入点表达式的id
+        -->
+        <aop:advisor advice-ref="myAdvice" pointcut-ref="servicePt"/>
+    </aop:config>
+
 </beans>

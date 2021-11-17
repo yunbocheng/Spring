@@ -528,6 +528,8 @@ execution(访问权限 方法返回值 包名.类名.方法名称(方法的参�
 
 ### 5.1 针对事务的分析
 
+**spring的事务操作是在同一个数据库执行的，操作的是这个数据库中的不同表。**
+
 什么是事务：
 
 - 在mysql中提出了关于事务的一词。事务是指一组sql语句的集合，集合中有多条sql语句。可能是delete、update、insert等语句。我们希望这些sql语句同时成功或者失败才可以完成相应的功能。**比如转账系统。**这些sql语句的执行是一致的，作为一个整体执行。
@@ -691,6 +693,65 @@ execution(访问权限 方法返回值 包名.类名.方法名称(方法的参�
 
 3. 我们需要告诉spring，项目中类信息、方法的名称、方法的事务传播行为。
 
+#### 5.4 使用 Spring 的方式管理事务有两种方式
+
+- **声明式：使用的是AspectJ框架实现。**
+
+**使用aspectJ框架需要加入在pom.xml中加入aspectJ的依赖**
+
+```xml
+<dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-aspects</artifactId>
+      <version>5.2.5.RELEASE</version>
+    </dependency>
+```
+
+**在spring的主配置文件中(applicationContext.xml)使用以下代码**
+
+```xml
+<!--使用spring的aop方式进行事务处理-->
+    <!--1. 声明事务管理器-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <!--指定连接的数据库，指定上边定义的数据源-->
+        <property name="dataSource" ref="myDataSource"/>
+    </bean>
+
+    <!--2. 开启事务注解驱动，告诉spring使用注解管理事务，创建代理对象-->
+    <!--
+        注意：这里使用的annotation-driven 一定是tx类下的。
+        transaction-manager : 代表事务管理器的id值
+    -->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+```
+
+- **注解式：使用注解Spring中自带的aop方式实现。**
+
+```xml
+<!--1. 声明事务管理对象-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="myDataSource"/>
+    </bean>
+<!--2. 声明业务方法的事务属性(隔离级别、传播行为、超时时间)-->
+<tx:advice id="myAdvice" transaction-manager="transactionManager">
+        <!--tx:attributes：是advice的子标签，代表配置这个事务的属性-->
+        <tx:attributes>
+            <tx:method name="buy" propagation="REQUIRED" isolation="DEFAULT"
+                       rollback-for="java.lang.NullPointerException,com.yunbocheng.error.RangeExceeds"/>
+            <!--使用通配符的方式，一次指定很多个以 add开头的方法-->
+            <tx:method name="add*" propagation="REQUIRES_NEW"/>
+            <!--使用通配符指定修改方法-->
+            <tx:method name="modify*" />
+            <!--指定除了上边的所有方法的属性-->
+            <tx:method name="*" read-only="true" propagation="SUPPORTS" />
+        </tx:attributes>
+    </tx:advice>
+ <!--3. 配置aop-->
+<aop:pointcut id="servicePt" expression="execution(* *..service..*.*(..))"/>
+	<aop:advisor advice-ref="myAdvice" pointcut-ref="servicePt"/>
+</aop:config>
+```
+
 #### 5.4 使用 Spring 的事务注解管理事务(掌握)
 
 通过@Transactional 注解方式，可将事务织入到相应 public 方法中，实现事务管理。
@@ -718,4 +779,139 @@ execution(访问权限 方法返回值 包名.类名.方法名称(方法的参�
 ➢ **noRollbackFor：**指定不需要回滚的异常类。类型为 Class[]，默认值为空数组。当然，若 只有一个异常类时，可以不使用数组。 
 
 ➢ **noRollbackForClassName：**指定不需要回滚的异常类类名。类型为 String[]，默认值为空 数组。当然，若只有一个异常类时，可以不使用数组。
+
+## 第六章 Spring与Web
+
+- 在 Web 项目中使用 Spring 框架，首先要解决在 web 层（这里指 Servlet）中获取到 Spring 容器的问题。只要在 web 层获取到了 Spring 容器，便可从容器中获取到 Service 对象。
+
+### 6.1Web 项目使用 Spring 的问题(了解)
+
+- **第一步：新建一个Maven Project**
+
+类型 maven-archetype-webapp
+
+- **第二步： 复制代码，配置文件，jar*
+
+将 spring-mybatis 项目中以下内容复制到当前项目中： 
+
+（1）Service 层、Dao 层全部代码 
+
+（2）配置文件 applicationContext.xml 及 jdbc.properties，mybatis.xml 
+
+（3）pom.xml 
+
+（4）加入 servlet ,jsp 依赖
+
+```xml
+<!-- servlet依赖 -->
+<dependency>
+ <groupId>javax.servlet</groupId>
+ <artifactId>javax.servlet-api</artifactId>
+ <version>3.1.0</version>
+ <scope>provided</scope>
+</dependency>
+<!-- jsp依赖 -->
+<dependency> 
+ <groupId>javax.servlet.jsp</groupId> 
+ <artifactId>jsp-api</artifactId> 
+ <version>2.2.1-b03</version> 
+ <scope>provided</scope>
+</dependency>
+
+```
+
+- **第三步：定义 index 页面**
+
+![image-20211117224804124](https://gitee.com/YunboCheng/imageBad/raw/master/image/image-20211117224804124.png)
+
+**第四步：定义 RegisterServlet（重点代码）**
+
+![](https://gitee.com/YunboCheng/imageBad/raw/master/image/20211117224944.png)
+
+**第五步：定义 success 页面**
+
+![image-20211117225025992](https://gitee.com/YunboCheng/imageBad/raw/master/image/image-20211117225025992.png)
+
+**第六步：web.xml 注册 Servlet**
+
+![](https://gitee.com/YunboCheng/imageBad/raw/master/image/20211117225047.png)
+
+**第七步：运行结果分析**
+
+- 当表单提交，跳转到 success.jsp 后，多刷新几次页面，查看后台输出，发现每刷新一次 页面，就 new 出一个新的 Spring 容器。即，每提交一次请求，就会创建一个新的 Spring 容 器。对于一个应用来说，只需要一个 Spring 容器即可。所以，将 Spring 容器的创建语句放 在 Servlet 的 doGet()或 doPost()方法中是有问题的。
+
+![](https://gitee.com/YunboCheng/imageBad/raw/master/image/20211117225118.png)
+
+- 此时，可以考虑，将 Spring 容器的创建放在 Servlet 进行初始化时进行，即执行 init()方 法时执行。并且，Servlet 还是单例多线程的，即一个业务只有一个 Servlet 实例，所有执行 该业务的用户执行的都是这一个 Servlet 实例。这样，Spring 容器就具有了唯一性了。
+- 但是，Servlet 是一个业务一个 Servlet 实例，即 LoginServlet 只有一个，但还会有 StudentServlet、TeacherServlet 等。每个业务都会有一个 Servlet，都会执行自己的 init()方法， 也就都会创建一个 Spring 容器了。这样一来，Spring 容器就又不唯一了。
+
+### 6.2使用 Spring 的监听器 ContextLoaderListener(掌握)
+
+- 举例：springweb-2 项目（在 spring-web 项目基础上修改）
+- 对于 Web 应用来说，ServletContext 对象是唯一的，一个 Web 应用，只有一个 ServletContext 对象，该对象是在 Web 应用装载时初始化的。若将 Spring 容器的创建时机， 放在 ServletContext 初始化时，就可以保证 Spring 容器的创建只会执行一次，也就保证了 Spring 容器在整个应用中的唯一性。
+- 当 Spring 容器创建好后，在整个应用的生命周期过程中，Spring 容器应该是随时可以被访问的。即，Spring 容器应具有全局性。而放入 ServletContext 对象的属性，就具有应用的 全局性。所以，将创建好的 Spring 容器，以属性的形式放入到 ServletContext 的空间中，就 保证了 Spring 容器的全局性。
+- 上述的这些工作，已经被封装在了如下的 Spring 的 Jar 包的相关 API 中：spring-web-5.2.5.RELEASE
+
+**第一步：maven 依赖 pom.xml**
+
+```xml
+<dependency>
+<groupId>org.springframework</groupId>
+<artifactId>spring-web</artifactId>
+<version>5.2.5.RELEASE</version>
+</dependency>
+```
+
+**第二步：注册监听器 ContextLoaderListener**
+
+- 若要在 ServletContext 初 始 化 时 创 建 Spring 容 器 ， 就 需 要 使 用 监 听 器 接 口 ServletContextListener 对 ServletContext 进行监听。在 web.xml 中注册该监听器。
+
+![image-20211117225421191](https://gitee.com/YunboCheng/imageBad/raw/master/image/image-20211117225421191.png)
+
+- Spring 为该监听器接口定义了一个实现类 ContextLoaderListener，完成了两个很重要的 工作：创建容器对象，并将容器对象放入到了 ServletContext 的空间中。
+- 打开 ContextLoaderListener 的源码。看到一共四个方法，两个是构造方法，一个初始化 方法，一个销毁方法。
+
+![](https://gitee.com/YunboCheng/imageBad/raw/master/image/20211117225446.png)
+
+所以，在这四个方法中较重要的方法应该就是 contextInitialized()，context 初始化方法。
+
+- 跟踪 initWebApplicationContext()方法，可以看到，在其中创建了容器对象。
+
+![image-20211117225511622](https://gitee.com/YunboCheng/imageBad/raw/master/image/image-20211117225511622.png)
+
+并且，将创建好的容器对象放入到了 ServletContext 的空间中，key 为一个常量： WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE。
+
+![](https://gitee.com/YunboCheng/imageBad/raw/master/image/20211117225527.png)
+
+**第三步：指定 Spring 配置文件的位置< context-parm >**
+
+- ContextLoaderListener 在对 Spring 容器进行创建时，需要加载 Spring 配置文件。其默认 的 Spring 配置文件位置与名称为：WEB-INF/applicationContext.xml。但，一般会将该配置文 件放置于项目的 classpath 下，即 src 下，所以需要在 web.xml 中对 Spring 配置文件的位置及 名称进行指定。
+
+![](https://gitee.com/YunboCheng/imageBad/raw/master/image/20211117225625.png)
+
+- 从监听器 ContextLoaderListener 的父类 ContextLoader 的源码中可以看到其要读取的配 置文件位置参数名称 contextConfigLocation。
+
+![](https://gitee.com/YunboCheng/imageBad/raw/master/image/20211117225641.png)
+
+**第四步：获取 Spring 容器对象**
+
+在 Servlet 中获取容器对象的常用方式有两种：
+
+（1） 直接从 ServletContext 中获取
+
+从对监听器 ContextLoaderListener 的源码分析可知，容器对象在 ServletContext 的中存 放的 key 为 WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE。所以，可 以直接通过 ServletContext 的 getAttribute()方法，按照指定的 key 将容器对象获取到。
+
+![image-20211117225732047](https://gitee.com/YunboCheng/imageBad/raw/master/image/image-20211117225732047.png)
+
+（2） 通过 WebApplicationContextUtils 获取
+
+- 工具类 WebApplicationContextUtils 有一个方法专门用于从 ServletContext 中获取 Spring 容器对象：getRequiredWebApplicationContext(ServletContext sc)
+
+调用 Spring 提供的方法获取容器对象：
+
+![](https://gitee.com/YunboCheng/imageBad/raw/master/image/20211117225816.png)
+
+**总结：以上两种方式，无论使用哪种获取容器对象，刷新 success 页面后，可看到代码中使用 的 Spring 容器均为同一个对象。**
+
+![](https://gitee.com/YunboCheng/imageBad/raw/master/image/20211117225844.png)
 

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
 
     <!--这个配置文件的内容是固定的，只需要知道需要创建三个对象：数据源、factory、dao-->
     <!--
@@ -17,7 +17,8 @@
     -->
     <!--
            把数据库的配置信息写到一个独立的配置文件中，编译修改配置信息的内容
-           spring需要知道 jdbc.properties 文件的位置。
+           spring需要知道 jdbc.properties 文件的位置。将这个文件也放到resources下面
+           resource被编译之后就会消失，其中的配置文件全部在 target/classes 根路径之下。
      -->
     <!--引入属性配置文件-->
     <context:property-placeholder location="classpath:jdbc.properties"/>
@@ -32,7 +33,7 @@
 
             使用属性配置文件中的数据，语法 ${key}
         -->
-        <property name="url" value="${jdbc.url}" />
+        <property name="url" value="${jdbc.url}?serverTimezone=GMT%2B8&amp;useUnicode=true&amp;characterEncoding=utf8"/>
         <property name="username" value="${jdbc.username}" />
         <property name="password" value="${jdbc.password}" />
         <!--声明最大数据库连接池数量-->
@@ -60,6 +61,13 @@
             使用value属性来指定文件的路径，使用classpath：表示文件的位置。
             classpath : 代表的根路径是 target/classes
             classpath：从根路径开始的文件路径
+
+            这里可以使用通配符的格式(只要是我们自定义的路径，都可以使用通配符的方式)
+
+             指定的配置文件
+             <property name="configLocation" value="classpath:myBatis.xml"/>
+             <property name="configLocation" value="classpath:myBatis./xml"/>
+
         -->
         <property name="configLocation" value="classpath:myBatis.xml"/>
     </bean>
@@ -89,7 +97,7 @@
 
             value 使用分号或逗号设置多个包。
         -->
-        <property name="basePackage" value="com.yunbocheng.dao"/>
+        <property name="basePackage" value="com.yunbocheng.dao,com.yunbocheng.di01"/>
     </bean>
 
     <!--
@@ -103,22 +111,8 @@
         为我们自动的通过反射机制创建的出的接口的实现类对象，且这个实现类对象的类名是接口名称的首字母小写，也就是id值。
     -->
     <!--注册StudentService对象，给属性StudentDao注入值-->
-    <bean id="studentService" class="com.yunbocheng.service.impl.ServiceShopImpl">
-        <property name="goodsDao" ref="goodsDao"/>
-        <property name="saleDao" ref="saleDao"/>
+    <bean id="studentService" class="com.yunbocheng.service.impl.StudentServiceImpl">
+        <property name="studentDao" ref="studentDao"/>
     </bean>
 
-    <!--使用spring的aop方式进行事务处理-->
-    <!--1. 声明事务管理器-->
-    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-        <!--指定连接的数据库，指定上边定义的数据源-->
-        <property name="dataSource" ref="myDataSource"/>
-    </bean>
-
-    <!--2. 开启事务注解驱动，告诉spring使用注解管理事务，创建代理对象-->
-    <!--
-        注意：这里使用的annotation-driven 一定是tx类下的。
-        transaction-manager : 代表事务管理器的id值
-    -->
-    <tx:annotation-driven transaction-manager="transactionManager"/>
 </beans>

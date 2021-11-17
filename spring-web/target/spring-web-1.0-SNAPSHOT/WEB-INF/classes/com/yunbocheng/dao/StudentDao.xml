@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yunbocheng.dao.StudentDao">
+    <insert id="insertStudent" parameterType="Student">
+        insert into tab_student(num,province,city,name,age,score,room) values(#{num},#{province},#{city},#{name},#{age},#{score},#{room})
+    </insert>
+
+    <select id="selectStudents" resultType="Student">
+        select * from tab_student order by id desc
+    </select>
+
+    <delete id="deleteStudent" parameterType="Student">
+        delete from tab_student where num = #{num}
+    </delete>
+
+<!--    <insert id="updateStudent" parameterType="Student">
+        update tab_student set num = #{num} age = #{age},score=#{score},room = #{room} where num = #{num}
+    </insert>-->
+</mapper>

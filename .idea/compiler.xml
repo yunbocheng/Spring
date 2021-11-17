@@ -12,10 +12,12 @@
         <module name="spring-aop-aspectJ" />
         <module name="spring-di-annotation" />
         <module name="spring-mybatis" />
+        <module name="spring-affair" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="Hello-Spring" target="1.8" />
+      <module name="spring-affair" target="1.8" />
       <module name="spring-aop-aspectJ" target="1.8" />
       <module name="spring-di-annotation" target="1.8" />
       <module name="spring-di-xml" target="1.8" />

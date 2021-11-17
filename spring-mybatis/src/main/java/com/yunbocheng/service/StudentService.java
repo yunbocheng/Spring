@@ -10,9 +10,9 @@ import java.util.List;
  */
 public interface StudentService {
 
-/*    // 录入学生信息方法
+    // 录入学生信息方法
     int addStudent(Student student);
 
     // 查询全部学生方法
-    List<Student> queryStudents();*/
+    List<Student> queryStudents();
 }

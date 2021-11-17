@@ -9,6 +9,7 @@
         <option value="$PROJECT_DIR$/spring-di-annotation/pom.xml" />
         <option value="$PROJECT_DIR$/spring-aop-aspectJ/pom.xml" />
         <option value="$PROJECT_DIR$/spring-mybatis/pom.xml" />
+        <option value="$PROJECT_DIR$/spring-affair/pom.xml" />
       </list>
     </option>
   </component>

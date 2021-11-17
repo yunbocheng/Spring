@@ -19,21 +19,21 @@
     <bean id="student" class="com.yunbocheng.di03.Student">
         <constructor-arg name="MyName" value="程云博"/>
         <constructor-arg name="MyAge" value="20"/>
-        <constructor-arg name="MySchool" value="school"/>
+        <constructor-arg name="MySchool" ref="school"/>
     </bean>
 
     <!--使用index赋值，这种模式可以改变顺序，只要保证该序号的赋值的类型和有参构造中类型匹配即可-->
     <bean id="student1" class="com.yunbocheng.di03.Student">
         <constructor-arg index="1" value="20"/>
         <constructor-arg index="0" value="程云博"/>
-        <constructor-arg index="2" value="school"/>
+        <constructor-arg index="2" ref="school"/>
     </bean>
 
     <!--index方式的省略模式，这种省略的顺序就是0，1，2-->
     <bean id="student2" class="com.yunbocheng.di03.Student">
         <constructor-arg index="0" value="程云博"/>
         <constructor-arg index="1" value="20"/>
-        <constructor-arg index="2" value="school"/>
+        <constructor-arg index="2" ref="school"/>
     </bean>
 
     <!--使用实体类对象赋值-->

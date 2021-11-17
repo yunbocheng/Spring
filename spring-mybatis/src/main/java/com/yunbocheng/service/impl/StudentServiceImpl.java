@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class StudentServiceImpl implements StudentService {
 
-/*    // 实现这两个放需要调用dao层中的方法，所以需要在这来创建一个dao对象
+    // 实现这两个放需要调用dao层中的方法，所以需要在这来创建一个dao对象
     private StudentDao studentDao;
 
     // 使用set注入，进行对象的赋值，但是需要的是提供set方法
@@ -29,5 +29,5 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public List<Student> queryStudents() {
         return studentDao.selectStudents();
-    }*/
+    }
 }

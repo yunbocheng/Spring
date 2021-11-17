@@ -249,7 +249,7 @@ execution(访问权限 方法返回值 包名.类名.方法名称(方法的参�
 
 **举列说明：（只有返回值类型以及方法名(参数)这两个参数不可以省略，所在在简化的切点表达中肯定存在这两个参数的信息）**
 
-- **execution(public * *(..))** :  指定切入点的位置，任意公共的方法。
+- **execution(public * *(..))** :  指定切入点的位置，任意类任意公共的方法。
 - **execution(* set*(...)) : ** 指定切入点的位置，任意一个以 "set" 开始的方法。
 - **execution(* com.yunbocheng.service.* .*(..)) :** 指定切入点的位置是service包中的任意类中的任意方法。
 - **execution(* com.yunbocheng.service..* .*(..))：**指定切入点的位置是 service包或者子包中的任意类的任意方法。".."出现在类名中时，后面必须跟"*"，表示包、子包下的所有类。
@@ -334,7 +334,11 @@ execution(访问权限 方法返回值 包名.类名.方法名称(方法的参�
 
 ![](https://gitee.com/YunboCheng/imageBad/raw/master/image/20211115095923.png)
 
-##  第四章 Spring继承MyBatis
+## 第四章 Spring集成MyBatis
+
+- Spring与MyBatis的整合需要借助于MyBatis的一个子项目MyBatis-Spring。通过MyBatis-Spring可以将MyBatis无缝的整合到Spring中，包括事务管理、Mapper生成、异常类型转化等，甚至是模板和支持工具类也有提供：SqlSessionTemplate
+
+### 4.1 集成技术分析
 
 - 将 MyBatis 与 Spring 进行整合，主要解决的问题就是将 SqlSessionFactory 对象交由 Spring 来管理。所以，该整合，只需要将 SqlSessionFactory 的对象生成器 SqlSessionFactoryBean 注 册在 Spring 容器中，再将其注入给 Dao 的实现类即可完成整合。
 - **实现 Spring 与 MyBatis 的整合常用的方式：扫描的 Mapper 动态代理**
@@ -369,9 +373,349 @@ execution(访问权限 方法返回值 包名.类名.方法名称(方法的参�
 
 使用xml的bean标签进行创建。
 
+**整合MyBatis的最核心的思想：使用spring的IoC核心技术，把mybatis框架中使用的对象交给spring统一创建和管理。spring是容器，存在项目中要使用到的各种对象。例如：Service对象、Dao对象，工具类等。**
+
+### 4.2 继承技术实现
+
+#### 4.2.1 MySQL 创建数据库 springdb,新建表 Student
+
+![image-20211116153214673](https://gitee.com/YunboCheng/imageBad/raw/master/image/image-20211116153214673.png)
 
 
 
+#### 4.2.2 maven 依赖 pom.xml
+
+```xml
+<dependency>
+<groupId>junit</groupId>
+<artifactId>junit</artifactId>
+<version>4.11</version>
+<scope>test</scope>
+</dependency>
+<dependency>
+<groupId>org.springframework</groupId>
+<artifactId>spring-context</artifactId>
+<version>5.2.5.RELEASE</version>
+</dependency>
+<dependency>
+<groupId>org.springframework</groupId>
+<artifactId>spring-tx</artifactId>
+<version>5.2.5.RELEASE</version>
+</dependency>
+<dependency>
+<groupId>org.springframework</groupId>
+<artifactId>spring-jdbc</artifactId>
+<version>5.2.5.RELEASE</version>
+</dependency>
+<dependency>
+<groupId>org.mybatis</groupId>
+<artifactId>mybatis</artifactId>
+<version>3.5.1</version>
+</dependency>
+<dependency>
+<groupId>org.mybatis</groupId>
+<artifactId>mybatis-spring</artifactId>
+<version>1.3.1</version>
+</dependency>
+<dependency>
+<groupId>mysql</groupId>
+<artifactId>mysql-connector-java</artifactId>
+<version>5.1.9</version>
+</dependency>
+<dependency>
+<groupId>com.alibaba</groupId>
+<artifactId>druid</artifactId>
+<version>1.1.12</version>
+</dependency>
+
+```
+
+#### 4.2.3 定义实体类 Student
+
+![image-20211116153326777](https://gitee.com/YunboCheng/imageBad/raw/master/image/image-20211116153326777.png)
+
+#### 4.2.4 定义 StudentDao 接口
+
+![](https://gitee.com/YunboCheng/imageBad/raw/master/image/20211116153348.png)
+
+#### 4.2.5  定义映射文件 mapper
+
+- 在 Dao 接口的包中创建 MyBatis 的映射文件 mapper，命名与接口名相同，本例为StudentDao.xml。mapper 中的 namespace 取值也为 Dao 接口的全限定性名。
+
+![](https://gitee.com/YunboCheng/imageBad/raw/master/image/20211116153435.png)
+
+#### 4.2.6 定义 Service 接口和实现类
+
+- 接口定义：
+
+![image-20211116153511602](https://gitee.com/YunboCheng/imageBad/raw/master/image/image-20211116153511602.png)
+
+- 实现类定义：
+
+![image-20211116153539647](https://gitee.com/YunboCheng/imageBad/raw/master/image/image-20211116153539647.png)
+
+#### 4.2.7 定义 MyBatis 主配置文件
+
+- 在 src 下定义 MyBatis 的主配置文件，命名为 mybatis.xml。
+
+**这里有两点需要注意：**
+
+（1）主配置文件中不再需要数据源的配置了。因为数据源要交给 Spring 容器来管理了。 
+
+（2）这里对 mapper 映射文件的注册，使用标签，即只需给出 mapper 映射文件 所在的包即可。因为 mapper 的名称与 Dao 接口名相同，可以使用这种简单注册方式。这种 方式的好处是，若有多个映射文件，这里的配置也是不用改变的。当然,也可使用原来的标签方式。
+
+![](https://gitee.com/YunboCheng/imageBad/raw/master/image/20211116153655.png)
+
+#### 4.2.8 修改 Spring 配置文件
+
+#### **4.2.8.1 数据源的配置(掌握)**
+
+- 使用 JDBC 模板，首先需要配置好数据源，数据源直接以 Bean 的形式配置在 Spring 配 置文件中。根据数据源的不同，其配置方式不同：
+
+**(1) Druid 数据源 DruidDataSource**
+
+- Druid 是阿里的开源数据库连接池。是 Java 语言中最好的数据库连接池。Druid 能 够提供强大的监控和扩展功能。Druid 与其他数据库连接池的最大区别是提供数据库的配置连接池。
+
+**官方属性**
+
+![](https://gitee.com/YunboCheng/imageBad/raw/master/image/20211116154045.png)
+
+**spring配置文件**
+
+![image-20211116154140441](https://gitee.com/YunboCheng/imageBad/raw/master/image/image-20211116154140441.png)
+
+**(2)从属性文件读取数据库连接信息**
+
+- 为了便于维护，可以将数据库连接信息写入到属性文件中，使 Spring 配置文件从中读取 数据。
+- **属性文件名称自定义，但一般都是放在 src 下。**
+
+![](https://gitee.com/YunboCheng/imageBad/raw/master/image/20211116154443.png)
+
+- Spring 配置文件从属性文件中读取数据时，需要在的 value 属性中使用${ }， 将在属性文件中定义的 key 括起来，以引用指定属性的值。
+
+![](https://gitee.com/YunboCheng/imageBad/raw/master/image/20211116154513.png)
+
+- 该属性文件若要被 Spring 配置文件读取，其必须在配置文件中进行注册。使用 标签。
+
+![](https://gitee.com/YunboCheng/imageBad/raw/master/image/20211116154613.png)
 
 
+
+#### **4.2.8.2  注册 SqlSessionFactoryBean**
+
+![](https://gitee.com/YunboCheng/imageBad/raw/master/image/20211116154718.png)
+
+#### **4.2.8.3   定义 Mapper 扫描配置器 MapperScannerConfigurer**
+
+- Mapper 扫描配置器 MapperScannerConfigurer 会自动生成指定的基本包中 mapper 的代理对象。该 Bean 无需设置 id 属性。**value使用分号或逗号设置多个包。**
+
+![](https://gitee.com/YunboCheng/imageBad/raw/master/image/20211116155009.png)
+
+#### 4.2.9 向 Service 注入接口名
+
+- 向 Service 注入 Mapper 代理对象时需要注意，由于通过 Mapper 扫描配置器 MapperScannerConfigurer 生成的 Mapper 代理对象没有名称，所以在向 Service 注入 Mapper 代理时，无法通过名称注入。但可通过接口的简单类名注入，因为生成的是这个 Dao 接口 的对象。
+- 重点：以前我们需要自己手动创建一个引用类型的id值，然后赋值给引用该类型的bean中的ref属性。但是使用spring之后，不用我们自己去手动赋给引用类型的bean的id值，此时使用的spring中的MapperScannerConfigurer为我们自动的通过反射机制创建的出的接口的实现类对象，且这个实现类对象的类名是接口名称的首字母小写，也就是id值。
+
+![image-20211116163809779](https://gitee.com/YunboCheng/imageBad/raw/master/image/image-20211116163809779.png)
+
+#### 4.2.10 Spring 配置文件全部配置
+
+![image-20211116163847141](https://gitee.com/YunboCheng/imageBad/raw/master/image/image-20211116163847141.png)
+
+
+
+## 第五章 Spring的事务
+
+### 5.1 针对事务的分析
+
+什么是事务：
+
+- 在mysql中提出了关于事务的一词。事务是指一组sql语句的集合，集合中有多条sql语句。可能是delete、update、insert等语句。我们希望这些sql语句同时成功或者失败才可以完成相应的功能。**比如转账系统。**这些sql语句的执行是一致的，作为一个整体执行。
+
+在什么时候使用事务
+
+- 当项目中实现某个功能需要多个表的时候，或者是多个sql语句的insert、update、delete。需要保证这些语句都是同时成功或者失败的时候才能完成某个功能。不可以是单独的某个sql语句执行成功那么功能就实现的。
+
+在Java代码中写程序，控制事务，此时事务应该放到哪里？
+
+- Service类的业务方法上，因为在Service类中的某个功能(方法)可能需要多个Dao中的方法才可以完成这个业务，而dao是执行sql语句的，此时就可以把这些dao调用的方法看做是一个业务
+
+通常使用JDBC访问数据库、mybatis访问数据库是怎么处理业务的。
+
+- JDBC访问数据库：处理事务 (Connection conn ;  conn.commit(); conn.rollback();)
+- mybatis访问数据库：处理事务（sqlSession.commit() ; sqlSession.rollback(); ）
+
+- hibernate访问数据库 ：处理事务（Session.commit() ;  Session.rollback();）
+
+以上处理业务有什么不足
+
+1. 不同的数据库需要不同的事务处理对象，方法不同，需要了解不同数据库事务的技术的原理
+2. 掌握多种数据库中事务处理的业务逻辑。什么时候提交事务，什么时候回滚事务。
+3. 处理事务的多中国方法不同。
+
+解决事务处理的不足之处
+
+- 使用spring框架统一解决事务处理
+
+### 5.2 Spring处理事务的统一方式
+
+- 事务原本是数据库中的概念，在 Dao 层。但一般情况下，需要将事务提升到业务层， 即 Service 层。这样做是为了能够使用事务的特性来管理具体的业务。
+
+在 Spring 中通常可以通过以下两种方式来实现对事务的管理：
+
+1. 使用 Spring 的事务注解管理事务
+2. 使用 AspectJ 的 AOP 配置管理事务 
+
+**spring提供了一种统一处理事务的模型，能使用统一步骤，方式完成多种不同数据库访问技术的事务处理。**
+
+- 使用spring的事务处理机制，可以完成mybatis访问数据库的事务处理。
+- 使用spring的事务处理机制，可以完成hibernate访问数据库的事务处理。
+
+![image-20211116201918300](https://gitee.com/YunboCheng/imageBad/raw/master/image/image-20211116201918300.png)
+
+![](https://gitee.com/YunboCheng/imageBad/raw/master/image/20211116203146.png)
+
+![image-20211116210252534](https://gitee.com/YunboCheng/imageBad/raw/master/image/image-20211116210252534.png)
+
+### 5.3 Spring事务管理API
+
+- Spring 的事务管理，主要用到两个事务相关的接口。
+
+#### （1） 事务管理器接口(重点)
+
+- **事务管理器是 PlatformTransactionManager 接口对象。**其主要用于完成事务的提交、回 滚，及获取事务的状态信息。
+
+![](https://gitee.com/YunboCheng/imageBad/raw/master/image/20211116210506.png)
+
+**事务管理器是 PlatformTransactionManager 接口对象。常用的两个实现类：**
+
+- **DataSourceTransactionManager：**使用 JDBC 或 MyBatis 进行数据库操作时使用。
+
+-  **HibernateTransactionManager：**使用 Hibernate 进行持久化数据时使用。
+
+**Spring的回滚方式(理解)**
+
+- Spring 事务的默认回滚方式是：**发生运行时异常和 error 时回滚，发生受查(编译)异常时提交。**不过，对于受查异常，程序员也可以手工设置其回滚方式。
+
+**回顾错误与异常**
+
+![](https://gitee.com/YunboCheng/imageBad/raw/master/image/20211116210912.png)
+
+- Throwable 类是 Java 语言中所有错误或异常的超类。只有当对象是此类(或其子类之一) 的实例时，才能通过 Java 虚拟机或者 Java 的 throw 语句抛出。
+- Error 是程序在运行过程中出现的无法处理的错误，比如 OutOfMemoryError、 ThreadDeath、NoSuchMethodError 等。当这些错误发生时，程序是无法处理（捕获或抛出） 的，JVM 一般会终止线程。
+- 程序在编译和运行时出现的另一类错误称之为异常，它是 JVM 通知程序员的一种方式。 通过这种方式，让程序员知道已经或可能出现错误，要求程序员对其进行处理。
+
+**异常分为运行时异常与受查异常。**
+
+- 运行时异常，是 RuntimeException 类或其子类，即只有在运行时才出现的异常。如， NullPointerException、ArrayIndexOutOfBoundsException、IllegalArgumentException 等均属于 运行时异常。这些异常由 JVM 抛出，在编译时不要求必须处理（捕获或抛出）。但，只要代 码编写足够仔细，程序足够健壮，运行时异常是可以避免的。
+- 受查异常，也叫编译时异常，即在代码编写时要求必须捕获或抛出的异常，若不处理， 则无法通过编译。如 SQLException，ClassNotFoundException，IOException 等都属于受查异常。
+- RuntimeException 及其子类以外的异常，均属于受查异常。当然，用户自定义的 Exception 的子类，即用户自定义的异常也属受查异常。程序员在定义异常时，只要未明确声明定义的 为 RuntimeException 的子类，那么定义的就是受查异常。
+
+#### （2） 事务定义接口
+
+- 事务定义接口 TransactionDefinition 中定义了事务描述相关的三类常量：**事务隔离级别、 事务传播行为、事务默认超时时限**，及对它们的操作
+
+![](https://gitee.com/YunboCheng/imageBad/raw/master/image/20211116211111.png)
+
+**定义了五个事务隔离级别常量(掌握)**
+
+**这些常量均是以 ISOLATION_开头。即形如 ISOLATION_XXX。**
+
+➢ DEFAULT：采用 DB 默认的事务隔离级别。MySql 的默认为 REPEATABLE_READ； Oracle 默认为 READ_COMMITTED。 
+
+➢ READ_UNCOMMITTED：读未提交。未解决任何并发问题。
+
+ ➢ READ_COMMITTED：读已提交。解决脏读，存在不可重复读与幻读。 
+
+➢ REPEATABLE_READ：可重复读。解决脏读、不可重复读，存在幻读 。
+
+➢ SERIALIZABLE：串行化。不存在并发问题。
+
+
+
+**定义了七个事务传播行为常量(掌握)**
+
+- 所谓事务传播行为是指，处于不同事务中的方法在相互调用时，执行期间事务的维护情 况。如，A 事务中的方法 doSome()调用 B 事务中的方法 doOther()，在调用执行期间事务的 维护情况，就称为事务传播行为。事务传播行为是加在方法上的。
+
+事务传播行为常量都是以 PROPAGATION_ 开头，形如 PROPAGATION_XXX。
+
+- **PROPAGATION_REQUIRED** 
+
+- **PROPAGATION_REQUIRES_NEW** 
+- **PROPAGATION_SUPPORTS**
+
+重点掌握前三个
+
+-  PROPAGATION_MANDATORY  
+- PROPAGATION_NESTED 
+- PROPAGATION_NEVER 
+- PROPAGATION_NOT_SUPPORTED
+
+**PROPAGATION_REQUIRED：**
+
+- 指定的方法必须在事务内执行。若当前存在事务，就加入到当前事务中；若当前没有事 务，则创建一个新事务。这种传播行为是最常见的选择，也是 Spring 默认的事务传播行为。
+- 如该传播行为加在 doOther()方法上。若 doSome()方法在调用 doOther()方法时就是在事 务内运行的，则 doOther()方法的执行也加入到该事务内执行。若 doSome()方法在调用 doOther()方法时没有在事务内执行，则 doOther()方法会创建一个事务，并在其中执行。
+
+![](https://gitee.com/YunboCheng/imageBad/raw/master/image/20211116213005.png)
+
+**PROPAGATION_SUPPORTS**
+
+- 指定的方法支持当前事务，但若当前没有事务，也可以以非事务方式执行。
+
+![image-20211116213029151](https://gitee.com/YunboCheng/imageBad/raw/master/image/image-20211116213029151.png)
+
+**PROPAGATION_REQUIRES_NEW**
+
+- 总是新建一个事务，若当前存在事务，就将当前事务挂起，直到新事务执行完毕
+
+![image-20211116213054881](C:/Users/YunboCheng/AppData/Roaming/Typora/typora-user-images/image-20211116213054881.png)
+
+**定义了默认事务超时时限**
+
+- 常量 TIMEOUT_DEFAULT 定义了事务底层默认的超时时限，sql 语句的执行时长。
+- 注意，事务的超时时限起作用的条件比较多，且超时的时间计算点较复杂。所以，该 值一般就使用默认值即可。
+
+![](https://gitee.com/YunboCheng/imageBad/raw/master/image/20211116215806.png)
+
+**总结spring的事务**
+
+1. 管理事务的是：事务管理和他的实现类
+
+2. spring的事务的一个统一模型
+
+   1）指定要使用的事务管理器实现类，使用<bean>
+
+   2）指定哪些类，哪些方法需要加入事务的功能。
+
+   3） 指定方法需要的隔离级别，传播行为，超时等
+
+3. 我们需要告诉spring，项目中类信息、方法的名称、方法的事务传播行为。
+
+#### 5.4 使用 Spring 的事务注解管理事务(掌握)
+
+通过@Transactional 注解方式，可将事务织入到相应 public 方法中，实现事务管理。
+
+需要注意的是，@Transactional 若用在方法上，只能用于 public 方法上。对于其他非 public 方法，如果加上了注解@Transactional，虽然 Spring 不会报错，但不会将指定事务织入到该 方法中。因为 Spring 会忽略掉所有非 public 方法上的@Transaction 注解。
+
+**若@Transaction 注解在类上，则表示该类上所有的方法均将在执行时织入事务。**
+
+**若@Transaction 注解在方法上，则表示该方法只能是public修饰的才可以将在执行时织入事务。**
+
+@Transactional 的所有可选属性如下所示：
+
+➢ **propagation：**用于设置事务传播属性。该属性类型为 Propagation 枚举，默认值为	Propagation.REQUIRED。
+
+➢ **isolation：**用于设置事务的隔离级别。该属性类型为 Isolation 枚举，默认值为 Isolation.DEFAULT。
+
+ ➢ **readOnly：**用于设置该方法对数据库的操作是否是只读的。该属性为 boolean，默认值 为 false。 
+
+➢ **timeout：**用于设置本操作与数据库连接的超时时限。单位为秒，类型为 int，默认值为 -1，即没有时限。
+
+ ➢ **rollbackFor：**指定需要回滚的异常类。类型为 Class[]，默认值为空数组。当然，若只有 一个异常类时，可以不使用数组。
+
+ ➢ **rollbackForClassName：**指定需要回滚的异常类类名。类型为 String[]，默认值为空数组。 当然，若只有一个异常类时，可以不使用数组。 
+
+➢ **noRollbackFor：**指定不需要回滚的异常类。类型为 Class[]，默认值为空数组。当然，若 只有一个异常类时，可以不使用数组。 
+
+➢ **noRollbackForClassName：**指定不需要回滚的异常类类名。类型为 String[]，默认值为空 数组。当然，若只有一个异常类时，可以不使用数组。
 

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+
 @Component("mySchool")
 public class School {
 

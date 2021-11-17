@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
 
     <!--这个配置文件的内容是固定的，只需要知道需要创建三个对象：数据源、factory、dao-->
     <!--
@@ -14,6 +15,14 @@
         init-method ：代表初始化数据源之后执行的方法，相当于无参构造
         destroy-method ：代表数据源销毁的时候调用的方法
     -->
+    <!--
+           把数据库的配置信息写到一个独立的配置文件中，编译修改配置信息的内容
+           spring需要知道 jdbc.properties 文件的位置。将这个文件也放到resources下面
+           resource被编译之后就会消失，其中的配置文件全部在 target/classes 根路径之下。
+     -->
+    <!--引入属性配置文件-->
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+
     <bean id="myDataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
         <!--
             连接数据库信息，使用set注入给DruidDataSource提供连接数据库信息
@@ -21,10 +30,12 @@
             因为要使用set注入（设值注入）
 
             这里不用给定数据库驱动Driver，因为Druid可以自动识别。
+
+            使用属性配置文件中的数据，语法 ${key}
         -->
-        <property name="url" value="jdbc:mysql://localhost:3306/school" />
-        <property name="username" value="root" />
-        <property name="password" value="567cybtfboys" />
+        <property name="url" value="${jdbc.url}?serverTimezone=GMT%2B8&amp;useUnicode=true&amp;characterEncoding=utf8"/>
+        <property name="username" value="${jdbc.username}" />
+        <property name="password" value="${jdbc.password}" />
         <!--声明最大数据库连接池数量-->
         <property name="maxActive" value="20"/>
     </bean>
@@ -50,6 +61,13 @@
             使用value属性来指定文件的路径，使用classpath：表示文件的位置。
             classpath : 代表的根路径是 target/classes
             classpath：从根路径开始的文件路径
+
+            这里可以使用通配符的格式(只要是我们自定义的路径，都可以使用通配符的方式)
+
+             指定的配置文件
+             <property name="configLocation" value="classpath:myBatis.xml"/>
+             <property name="configLocation" value="classpath:myBatis./xml"/>
+
         -->
         <property name="configLocation" value="classpath:myBatis.xml"/>
     </bean>
@@ -76,7 +94,25 @@
             不论这个包下有多少个接口，都会给创建一个对应的dao对象，这些对象全部存储到spring容器中
 
             这个包路径可以是大的范围也可以是小的范围，根据需求自己调整
+
+            value 使用分号或逗号设置多个包。
         -->
-        <property name="basePackage" value="com.yunbocheng.dao"/>
+        <property name="basePackage" value="com.yunbocheng.dao,com.yunbocheng.di01"/>
     </bean>
+
+    <!--
+        向 Service 注入 Mapper 代理对象时需要注意，由于通过 Mapper 扫描配置器
+        MapperScannerConfigurer生成的Mapper代理对象没有名称，所以在向 Service 注入 Mapper
+        代理时，无法通过名称注入。但可通过接口的简单类名注入，因为生成的是这个 Dao 接口
+        的对象。
+
+        重点：以前我们需要自己手动创建一个引用类型的id值，然后赋值给引用该类型的bean中的ref属性。
+        但是使用spring之后，不用我们自己去手动赋给引用类型的bean的id值，此时使用的spring中的MapperScannerConfigurer
+        为我们自动的通过反射机制创建的出的接口的实现类对象，且这个实现类对象的类名是接口名称的首字母小写，也就是id值。
+    -->
+    <!--注册StudentService对象，给属性StudentDao注入值-->
+    <bean id="studentService" class="com.yunbocheng.service.impl.StudentServiceImpl">
+        <property name="studentDao" ref="studentDao"/>
+    </bean>
+
 </beans>

@@ -13,6 +13,7 @@
         <property name="school" ref="school"/>
     </bean>
 
+
     <bean id="school" class="com.yunbocheng.di02.School">
         <property name="name" value="科技大学"/>
         <property name="address" value="山西太原"/>

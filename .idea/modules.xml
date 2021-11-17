@@ -4,7 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Hello-Spring/Hello-Spring.iml" filepath="$PROJECT_DIR$/Hello-Spring/Hello-Spring.iml" />
       <module fileurl="file://$PROJECT_DIR$/Spring.iml" filepath="$PROJECT_DIR$/Spring.iml" />
-      <module fileurl="file://$PROJECT_DIR$/spring-affair/spring-affair.iml" filepath="$PROJECT_DIR$/spring-affair/spring-affair.iml" />
+      <module fileurl="file://$PROJECT_DIR$/spring-affair/spring-affair-aop.iml" filepath="$PROJECT_DIR$/spring-affair/spring-affair-aop.iml" />
       <module fileurl="file://$PROJECT_DIR$/spring-aop-aspectJ/spring-aop-aspectJ.iml" filepath="$PROJECT_DIR$/spring-aop-aspectJ/spring-aop-aspectJ.iml" />
       <module fileurl="file://$PROJECT_DIR$/spring-di-annotation/spring-di-annotation.iml" filepath="$PROJECT_DIR$/spring-di-annotation/spring-di-annotation.iml" />
       <module fileurl="file://$PROJECT_DIR$/spring-di-xml/spring-di-xml.iml" filepath="$PROJECT_DIR$/spring-di-xml/spring-di-xml.iml" />

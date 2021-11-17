@@ -48,7 +48,14 @@ public class ServiceShopImpl implements ServiceShop {
             rollbackFor = {
                     NullPointerException.class,RangeExceeds.class
             }
-    )*/
+    )
+       rollbackFor : 表示发生指定的异常一定回滚
+        处理逻辑：
+            1) spring框架首先会检查方法抛出的异常是不是在rollbackFor的异常类型列表中
+               如果异常在rollbackFor列表中，不管是什么类型的异常，一定回滚。
+            2) 如果方法抛出的异常不在你的rollbackFor异常类型列表中，spring会判断异常
+               是不是运行时异常，如果是一定回滚。
+    */
     /*
         因为我们此时使用的事务注解中的属性值都是默认值，所以此时注解写一个事务注解即可，不需要添属性值，
         默认的传播行为：REQUIRED 默认的隔离级别：DEFAULT 默认不是只读的
